@@ -28,8 +28,6 @@ branch_names = {
     "AI": "Artificial Intelligence",
 }
 
-# Only attach an exact prefix where it is evidenced, or explicitly rule-derived.
-# Options share the parent roll code; they cannot be inferred from the email.
 programmes = [
     {"degree": "B.Tech.", "branch": "Artificial Intelligence and Data Science", "prefix": None, "source": "ai"},
     {"degree": "B.Tech.", "branch": "Artificial Intelligence", "prefix": None, "source": "ai"},
