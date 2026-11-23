@@ -411,4 +411,4 @@ Manual/automatable checks that pin the invariants in this document:
 
 - [High-Level Design](HLD.md)
 - [Project Selection Report](Project%20Selection%20Report.md)
-- [`../README.md`](../README.md)
+- [`README.md`](README.md)

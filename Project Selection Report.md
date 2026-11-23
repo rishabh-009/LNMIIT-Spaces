@@ -183,4 +183,4 @@ LNMIIT Spaces was selected because it sits at the intersection of a **real campu
 
 ---
 
-**Related:** [High-Level Design](HLD.md) · [Low-Level Design](LLD.md) · [`../README.md`](../README.md)
+**Related:** [High-Level Design](HLD.md) · [Low-Level Design](LLD.md) · [`README.md`](README.md)

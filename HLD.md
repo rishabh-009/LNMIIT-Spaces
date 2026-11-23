@@ -311,4 +311,4 @@ Detailed rationale and rejected alternatives appear in the [Project Selection Re
 
 - [Low-Level Design (LLD)](LLD.md) — module-level specification, algorithms, contracts
 - [Project Selection Report](Project%20Selection%20Report.md) — why this project and these technologies
-- [`../README.md`](../README.md) — user-facing quick start and feature reference
+- [`README.md`](README.md) — user-facing quick start and feature reference

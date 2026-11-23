@@ -216,9 +216,9 @@ app/
 
 ## 📚 Documentation
 
-- [High-Level Design](documentation/HLD.md)
-- [Low-Level Design](documentation/LLD.md)
-- [Project Selection Report](documentation/Project%20Selection%20Report.md)
+- [High-Level Design](HLD.md)
+- [Low-Level Design](LLD.md)
+- [Project Selection Report](Project%20Selection%20Report.md)
 
 ---
 
