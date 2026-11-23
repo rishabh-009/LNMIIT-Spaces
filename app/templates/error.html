@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Unable to complete request · LNMIIT Spaces{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>Unable to complete your request</h1>
+  <p>{% if error %}Please review the message above and try again, or return to the room directory.{% else %}Please try again or return to the room directory.{% endif %}</p>
+  <div class="actions">
+    <a class="button" href="/rooms">Browse rooms</a>
+    {% if user %}<a href="/bookings">My bookings</a>{% else %}<a href="/login">Log in</a>{% endif %}
+  </div>
+</section>
+{% endblock %}

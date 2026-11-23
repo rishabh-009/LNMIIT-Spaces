@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}My bookings · LNMIIT Spaces{% endblock %}
+{% block content %}
+<h1>My bookings</h1>
+{% if user.get('roll_number') %}
+<p class="muted">{{ user.roll_number }}{% if user.course %} · {{ user.course }}{% elif user.program_name %} · {{ user.program_name }}{% endif %}{% if user.branch_name %} · {{ user.branch_name }}{% endif %}{% if user.school %} · {{ user.school }}{% endif %} · Enrollment year code: {{ user.enrollment_year }}</p>
+{% endif %}
+<p class="muted">Review your reservations. Cancelling a confirmed booking frees its time slot.</p>
+<p><a href="/rooms">Find a room</a></p>
+{% for heading, entries in [('Upcoming', upcoming), ('Past', past)] %}
+<section class="card section-gap">
+  <h2>{{ heading }}</h2>
+  {% if entries %}
+  <div class="table-wrap" role="region" aria-label="{{ heading }} bookings" tabindex="0">
+    <table>
+      <caption class="visually-hidden">{{ heading }} reservations</caption>
+      <thead><tr><th scope="col">Room</th><th scope="col">Details</th><th scope="col">Start</th><th scope="col">End</th><th scope="col">Type</th><th scope="col">Status</th><th scope="col">Action</th></tr></thead>
+      <tbody>
+        {% for booking in entries %}
+        <tr>
+          <td>{{ booking.room_name }}</td>
+          <td>{{ booking.purpose }}<br><span class="muted">{{ booking.subject }}{% if booking.batch %} · {{ booking.batch }}{% endif %}</span></td>
+          <td><time datetime="{{ booking.start_time }}">{{ booking.start_time|replace('T', ' ') }}</time></td>
+          <td><time datetime="{{ booking.end_time }}">{{ booking.end_time|replace('T', ' ') }}</time></td>
+          <td>{{ 'Academic block' if booking.booking_type == 'ACADEMIC' else 'Reservation' }}</td>
+          <td><span class="tag {{ 'cancelled' if booking.status == 'CANCELLED' else '' }}">{{ booking.status }}</span></td>
+          <td>
+            {% if heading == 'Upcoming' and booking.status == 'CONFIRMED' and booking.booking_type == 'USER' %}
+            <form action="/bookings/{{ booking.id }}/cancel" method="post">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <input type="hidden" name="redirect_to" value="/bookings">
+              <button class="danger" type="submit" aria-label="Cancel booking {{ booking.id }} for {{ booking.room_name }} starting {{ booking.start_time }}">Cancel</button>
+            </form>
+            {% else %}<span class="muted">No action</span>{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}<p>No {{ heading|lower }} bookings.</p>{% endif %}
+</section>
+{% endfor %}
+{% endblock %}

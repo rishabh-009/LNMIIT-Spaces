@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Rooms · LNMIIT Spaces{% endblock %}
+{% block content %}
+    <h1>Find a space</h1>
+    <p class="muted">Browse rooms and check their schedule before planning a booking.</p>
+
+
+    <form action="/rooms" method="get" class="filters">
+      <label>Room type
+        <select name="room_type">
+          <option value="">All types</option>
+          {% for kind in room_types %}
+          <option value="{{ kind }}" {% if room_type == kind %}selected{% endif %}>{{ kind }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Minimum capacity
+        <input name="min_capacity" type="number" min="0" value="{{ min_capacity }}" required>
+      </label>
+      <button type="submit">Find rooms</button>
+      <a href="/rooms">Clear filters</a>
+    </form>
+
+    <p>{{ rooms|length }} room{% if rooms|length != 1 %}s{% endif %} found</p>
+    <section class="rooms" aria-label="Available rooms">
+      {% for room in rooms %}
+      <article class="card">
+        <span class="tag">{{ room.type }}</span>
+        <h2>{{ room.name }}</h2>
+        <p>{{ room.location }}</p>
+        <p>Capacity: {{ room.capacity }}</p>
+        <a class="button" href="/rooms/{{ room.id }}/bookings">View schedule<span class="visually-hidden"> for {{ room.name }}</span></a>
+      </article>
+      {% else %}
+      <p class="card">No rooms match these filters. Try another type or a smaller capacity.</p>
+      {% endfor %}
+    </section>
+{% endblock %}

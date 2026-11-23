@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <title>{% block title %}LNMIIT Spaces{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="/">LNMIIT Spaces</a>
+    <nav aria-label="Main navigation">
+      <a href="/rooms">Rooms</a>
+      {% if user %}
+      <a href="/bookings">My bookings</a>
+      {% if user.role == 'admin' %}<a href="/admin">Admin</a>{% endif %}
+      <span class="account">{{ user.name }}{% if user.get('roll_number') %} · {{ user.roll_number }}{% endif %}</span>
+      <form action="/logout" method="post" class="inline-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="nav-button" type="submit">Log out</button>
+      </form>
+      {% else %}
+      <a href="/login">Log in</a>
+      {% endif %}
+    </nav>
+  </header>
+  <main id="main" tabindex="-1">
+    {% if error %}<div class="notice error" role="alert">{{ error }}</div>{% endif %}
+    {% if message %}<div class="notice success" role="status">{{ message }}</div>{% endif %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer>LNMIIT Spaces · All times are campus local time (Asia/Kolkata).</footer>
+</body>
+</html>

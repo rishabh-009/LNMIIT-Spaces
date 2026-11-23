@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}{{ room.name }} · LNMIIT Spaces{% endblock %}
+{% block content %}
+    <a href="/rooms">Back to rooms</a>
+    <h1>{{ room.name }}</h1>
+    <p>{{ room.type }} · {{ room.location }} · Capacity {{ room.capacity }}</p>
+    <form method="get" class="filters">
+      <label>Date <input type="date" name="day" value="{{ day }}" required></label>
+      <button type="submit">Show schedule</button>
+    </form>
+    <p class="muted">All times are campus local time (Asia/Kolkata). Only confirmed reservations block a room.</p>
+    <section class="card">
+      <h2>Schedule for {{ day }}</h2>
+      {% if bookings %}
+      <div class="table-wrap" role="region" aria-label="Daily room schedule" tabindex="0">
+        <table>
+          <caption class="visually-hidden">Occupied times for {{ room.name }} on {{ day }}</caption>
+          <thead><tr><th scope="col">Start</th><th scope="col">End</th><th scope="col">Reservation</th></tr></thead>
+          <tbody>
+            {% for booking in bookings %}
+            <tr>
+              <td>{{ booking.start_time|replace('T', ' ') }}</td>
+              <td>{{ booking.end_time|replace('T', ' ') }}</td>
+              <td>{{ 'Academic block' if booking.booking_type == 'ACADEMIC' else 'Booked' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p>No confirmed reservations for this date.</p>
+      {% endif %}
+    </section>
+
+    <section class="card section-gap">
+      <h2>Book this room</h2>
+      {% if user %}
+      <form action="/bookings" method="post" class="form-grid">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="room_id" value="{{ room.id }}">
+        <label class="full-width">Date <input name="day" type="date" value="{{ values.get('day', day) }}" required></label>
+        <label>Start time <input name="start_time" type="time" value="{{ values.get('start_time', '') }}" required></label>
+        <label>End time <input name="end_time" type="time" value="{{ values.get('end_time', '') }}" required></label>
+        <label>Subject <input name="subject" value="{{ values.get('subject', '') }}" required></label>
+        <label>Batch <input name="batch" value="{{ values.get('batch', '') }}" required></label>
+        <label class="full-width">Purpose <textarea name="purpose" rows="3" required>{{ values.get('purpose', '') }}</textarea></label>
+        <p class="muted full-width">Choose an end time later than the start time on the same date. Availability is checked when you submit.</p>
+        <button class="full-width" type="submit">Confirm booking</button>
+      </form>
+      {% else %}
+      <p>Log in to reserve an available time.</p>
+      <a class="button" href="/login">Log in to book</a>
+      {% endif %}
+    </section>
+{% endblock %}

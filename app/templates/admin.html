@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Admin · LNMIIT Spaces{% endblock %}
+{% macro room_form(room) %}
+<form action="/admin/rooms" method="post" class="form-grid">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <input type="hidden" name="room_id" value="{{ room.id if room else 0 }}">
+  <label>Name <input name="name" value="{{ room.name if room else '' }}" required></label>
+  <label>Room type
+    <select name="room_type" required>
+      {% for kind in room_types %}<option value="{{ kind }}" {% if room and room.type == kind %}selected{% endif %}>{{ kind }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>Capacity <input name="capacity" type="number" min="1" value="{{ room.capacity if room else '' }}" required></label>
+  <label>Location <input name="location" value="{{ room.location if room else '' }}" required></label>
+  <label class="checkbox-label"><input name="is_active" type="checkbox" value="1" {% if not room or room.is_active %}checked{% endif %}> Active room</label>
+  <button type="submit">{{ 'Save changes' if room else 'Add room' }}</button>
+</form>
+{% endmacro %}
+{% block content %}
+<h1>Administration</h1>
+<nav class="section-nav" aria-label="Administration sections"><a href="#add-room">Add room</a><a href="#edit-rooms">Edit rooms</a><a href="#academic-block">Academic block</a><a href="#all-bookings">All bookings</a></nav>
+<section class="card section-gap" id="add-room">
+  <h2>Add a room</h2>
+  {{ room_form(none) }}
+</section>
+<section class="section-gap" id="edit-rooms">
+  <h2>Edit rooms</h2>
+  <p class="muted">Inactive rooms are hidden from the directory and cannot receive new reservations.</p>
+  <div class="rooms">
+    {% for room in rooms %}
+    <article class="card">
+      <h3>{{ room.name }} <span class="tag {{ '' if room.is_active else 'cancelled' }}">{{ 'Active' if room.is_active else 'Inactive' }}</span></h3>
+      {{ room_form(room) }}
+    </article>
+    {% else %}<p>No rooms yet. Add a room above.</p>{% endfor %}
+  </div>
+</section>
+<section class="card section-gap" id="academic-block">
+  <h2>Block an academic slot</h2>
+  <p class="muted">Academic blocks reserve a room for one dated class period.</p>
+  {% if rooms|selectattr('is_active')|list %}
+  <form action="/admin/blocks" method="post" class="form-grid">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label>Room
+      <select name="room_id" required>
+        {% for room in rooms if room.is_active %}<option value="{{ room.id }}">{{ room.name }} · {{ room.location }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>Date <input type="date" name="day" value="{{ today }}" required></label>
+    <label>Start time <input type="time" name="start_time" required></label>
+    <label>End time <input type="time" name="end_time" required></label>
+    <label>Subject <input name="subject" required></label>
+    <label>Batch <input name="batch" required></label>
+    <label class="full-width">Purpose <textarea name="purpose" rows="3" required></textarea></label>
+    <button class="full-width" type="submit">Create academic block</button>
+  </form>
+  {% else %}<p>Add or activate a room before creating an academic block.</p>{% endif %}
+</section>
+<section class="card section-gap" id="all-bookings">
+  <h2>All bookings</h2>
+  {% if bookings %}
+  <div class="table-wrap" role="region" aria-label="All bookings" tabindex="0">
+    <table>
+      <caption class="visually-hidden">Reservations and academic blocks</caption>
+      <thead><tr><th scope="col">Room</th><th scope="col">Booked by</th><th scope="col">Details</th><th scope="col">Start</th><th scope="col">End</th><th scope="col">Type</th><th scope="col">Status</th><th scope="col">Action</th></tr></thead>
+      <tbody>
+        {% for booking in bookings %}
+        <tr>
+          <td>{{ booking.room_name }}</td>
+          <td>{{ booking.user_name }}<br><span class="muted">{{ booking.user_email }}</span></td>
+          <td>{{ booking.purpose }}<br><span class="muted">{{ booking.subject }}{% if booking.batch %} · {{ booking.batch }}{% endif %}</span></td>
+          <td><time datetime="{{ booking.start_time }}">{{ booking.start_time|replace('T', ' ') }}</time></td>
+          <td><time datetime="{{ booking.end_time }}">{{ booking.end_time|replace('T', ' ') }}</time></td>
+          <td>{{ 'Academic block' if booking.booking_type == 'ACADEMIC' else 'Reservation' }}</td>
+          <td><span class="tag {{ 'cancelled' if booking.status == 'CANCELLED' else '' }}">{{ booking.status }}</span></td>
+          <td>
+            {% if booking.status == 'CONFIRMED' %}
+            <form action="/bookings/{{ booking.id }}/cancel" method="post">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <input type="hidden" name="redirect_to" value="/admin">
+              <button class="danger" type="submit" aria-label="Cancel booking {{ booking.id }} for {{ booking.room_name }} starting {{ booking.start_time }}">Cancel</button>
+            </form>
+            {% else %}<span class="muted">No action</span>{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}<p>No bookings have been made.</p>{% endif %}
+</section>
+{% endblock %}

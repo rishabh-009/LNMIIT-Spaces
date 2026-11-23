@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Runtime data (SQLite database is created at startup)
+app/data/*.db
+app/data/*.db-journal
+app/data/*.db-wal
+app/data/*.db-shm
+
+# Environment
+.env
+.env.*
+
+# Editors / OS
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
